@@ -81,7 +81,7 @@ app.post('/', function (req, res) {
 });
 app.post('/home', function (req, res) {
     const id = req.body.id;
-    switch(id) {
+    switch (id) {
         case "wanttogo":
             res.redirect('wanttogo')
             break;
@@ -99,7 +99,7 @@ app.post('/home', function (req, res) {
 });
 app.post('/islands', function (req, res) {
     const id = req.body.id;
-    switch(id) {
+    switch (id) {
         case "bali":
             res.redirect('bali')
             break;
@@ -112,7 +112,7 @@ app.post('/islands', function (req, res) {
 app.post('/cities', function (req, res) {
 
     const id = req.body.id;
-    switch(id) {
+    switch (id) {
         case "paris":
             res.redirect('paris')
             break;
@@ -123,7 +123,7 @@ app.post('/cities', function (req, res) {
 });
 app.post('/hiking', function (req, res) {
     const id = req.body.id;
-    switch(id) {
+    switch (id) {
         case "inca":
             res.redirect('inca')
             break;
@@ -136,8 +136,21 @@ app.post('/hiking', function (req, res) {
 app.post('/registration', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
+    var type = req.body.value;
+    // something wrong here
+    if (type.equals("Register")) {
+        registration(username, password);
+    }
+});
+app.get('/register', function (req, res) {
+    //issue here
+   res.render('login')
+});
+app.post('/register', function (req, res) {
+    //issue here
+    var username = req.body.username;
+    var password = req.body.password;
     registration(username, password);
-
 });
 app.post('/searchresults', function (req, res) {
 
@@ -169,30 +182,36 @@ app.post('/santorini', function (req, res) {
 });
 
 function login(username, password, res) {
-    var search = db.collection('DB').find({username: username, password: password},{$exists:
-        true}).toArray();
-    console.log(search.length);
-    if (search.length == 0) {
-        alert("Username or password is incorrect!")
-        res.render('login');
-    } else {
-        res.render('home');
-    }
+    // alert issue
+    db.collection('DB').find({username: username, password: password}, {
+        $exists: true
+    }).toArray(function (error, result) {
+        if (result.length == 0) {
+            console.log("Username or password is incorrect!");
+            res.render('login');
+        } else {
+            res.render('home');
+        }
+    });
+
 }
 
 function registration(username, password, res) {
-    var out = db.collection('DB').find({username: username}).toArray();
-    if (out.length != 0) {
-        alert("Username is already used!")
-        res.render('registration');
-    } else if (username == "" || password == "") {
-        alert("Username and Password can not be empty!");
-        res.redirect('registration');
-    } else {
-        db.collection('DB').insertOne(x);
-        alert("Registration was successful!");
-        res.redirect('/');
-    }
+    // alert issue
+    db.collection('DB').find({username: username}).toArray(function (error, result) {
+        if (result.length != 0) {
+            console.log("Username is already used!")
+            res.render('registration');
+        } else if (username == "" || password == "") {
+            console.log("Username and Password can not be empty!");
+            res.redirect('registration');
+        } else {
+            db.collection('DB').insertOne({username: username,password:password});
+            console.log("Registration was successful!");
+            res.redirect('/');
+        }
+    });
+
 }
 
 app.listen(3000);
