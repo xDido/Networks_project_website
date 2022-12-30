@@ -70,7 +70,27 @@ app.post('/', function (req, res) {
         let collection = db.collection('FirstCollection');
         collection.find({username: x} && {password: y}, {$exists: true}).toArray(function (err, items) //find if a value exists
         {
-            console.log(items[0]);
+            if (items.length == 0) {
+
+                alert('user not found');
+                res.render('login');
+            } else if (x.length == 0 || y.length == 0) {
+                alert('please enter all the fields');
+            } else {
+                return res.redirect('home');
+            }
+        })
+    })
+});
+app.post('/login', function (req, res) {
+    let x = req.body.username;
+    let y = req.body.password;
+    req.session.username = x;
+    MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
+        let db = client.db('MyDB');
+        let collection = db.collection('FirstCollection');
+        collection.find({username: x} && {password: y}, {$exists: true}).toArray(function (err, items) //find if a value exists
+        {
             if (items.length == 0) {
 
                 alert('user not found');
@@ -88,8 +108,6 @@ app.post('/', function (req, res) {
 let MongoClient = require('mongodb').MongoClient;
 MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
     if (err) throw err;
-    let db = client.db('MyDB');
-
 });
 
 app.post('home', function (req, res) {
@@ -127,54 +145,49 @@ app.post('islands', function (req, res) {
 app.post('cities', function (req, res) {
 });
 app.post('/annapurna', function (req, res) {
-    addToWanttogolist(req,res,"annapurna");
+    addToList(req,res,"annapurna");
 });
 app.post('/paris', function (req, res) {
-    addToWanttogolist(req,res,"paris");
+    addToList(req,res,"paris");
 });
 app.post('/inca', function (req, res) {
-    addToWanttogolist(req,res,"inca");
+    addToList(req,res,"inca");
 });
 app.post('/rome', function (req, res) {
 
-    addToWanttogolist(req,res,"rome");
+    addToList(req,res,"rome");
 });
 app.post('/santorini', function (req, res) {
-    addToWanttogolist(req,res,"santorini");
+    addToList(req,res,"santorini");
 });
 app.post('/bali', function (req, res) {
-    addToWanttogolist(req,res,"bali");
+    addToList(req,res,"bali");
 });
 app.post('wanttogo', function (req, res) {
 
 });
-
-function addToWanttogolist(req, res, place) {
+function addToList(req, res, destination) {
     MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
-        let db = client.db('MyDB');
-        let collection = db.collection('FirstCollection');
-        let username = {username: req.session.username};
-        let user = collection.findOne(username);
-        let list = user.list;
-        let found = false;
+        let db = client.db('MyDB').collection('FirstCollection');
+        let username = req.session.username;
+        db.findOne({username: username},function(err,res){ const list = res.list;
+            let found = false;
 
-        for (let i = 0; i < list.length; i++) {
-            if (list[i] == place) {
-                found = true;
+            for (let i = 0; i < list.length; i++) {
+                if (list[i] == destination) {
+                    found = true;
+                }
             }
-        }
-        if (found) {
-            alert("already on your want to go list!");
-        } else {
-            alert("added successfully!");
-            list.push(place);
-            let newlist = {$set: {list: list}};
-            collection.updateOne(username, newlist, function (err, res) {
-                if (err) throw err;
-                console.log("document updated");
-            });
-        }
-    });
+            if (found) {
+                alert("already on your want to go list!");
+            } else {
+                alert("added successfully");
+                list.push(destination);
+                db.updateOne({username: username}, {$set: {list: list}}, function (err, res) {
+                    if (err) throw err;
+                });
+            }
+        });});
 }
 
 
