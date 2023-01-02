@@ -170,7 +170,6 @@ app.post('/register', function (req, res) {
             collection.find({username: z} && {password: m}, {$exists: true}).toArray(function (err, items) //find if a value exists
             {
                 if (err) throw err;
-
                 if (items.length === 0) {
                     db.collection('myCollection').insertOne({username: z, password: m, wanttogolist: []});
                     alert('Successfully logged in');
@@ -182,19 +181,21 @@ app.post('/register', function (req, res) {
         }
     });
 });
-let allPlaces = ['annapurna', 'bali', 'inca', 'paris', 'rome', 'santorini'];
+
+let allPlaces = ['annapurna','bali','inca','paris','rome','santorini'];
 app.post('/search', function (req, res) {
-    const z = req.body.Search;
+    let z=req.body.Search;
         let searchresult = [];
-        for (let j = 0; j < allPlaces.length; j++) {
-            if (allPlaces[j].includes(z.toLowerCase())) {
+        for( let j=0; j<allPlaces.length;j++){
+            if(allPlaces[j].includes(z.toLowerCase())){
                 searchresult.push(allPlaces[j]);
             }
         }
-        if (searchresult.length === 0) {
+        if(searchresult.length==0){
             alert("Can't find what you are looking for");
         }
-        res.render('searchresults', {place: searchresult});
+        res.render('searchresults',{place:searchresult});
+
 });
 app.post('/hiking', function (req, res) {
 });
