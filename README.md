@@ -1,4 +1,5 @@
-# Networks_project_website
+# MyFirstWebsite_NetworksCourse
+![alt text](https://a.cdn-hotels.com/gdcs/production18/d1838/041ae6b1-0a88-4c22-a648-53a22dd4a006.jpg)
 ## Introduction
 The objective of this project is to give you an experience in developing a network application based on
 the client/server architecture. You are required to build a web application that is used as a simple
